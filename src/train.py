@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from typing import Any
 
 import torch
@@ -31,8 +30,8 @@ def train(
     device: str | None = None,
 ) -> dict[str, Any]:
     device = device or ("cuda" if torch.cuda.is_available() else "cpu")
-    train_rec = generate_split(n_train, "train")
-    test_rec = generate_split(n_test, "test")
+    train_rec = generate_split(n_train, "train", force=True)
+    test_rec = generate_split(n_test, "test", force=True)
 
     train_loader = DataLoader(
         DefectDataset(train_rec, train=True),
