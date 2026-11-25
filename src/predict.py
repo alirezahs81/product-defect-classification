@@ -13,6 +13,13 @@ from src.dataset import default_transform
 from src.model import DefectCNN
 
 
+def _load_checkpoint(path: Path, device: str):
+    try:
+        return torch.load(path, map_location=device, weights_only=False)
+    except TypeError:
+        return torch.load(path, map_location=device)
+
+
 class DefectPredictor:
     def __init__(self, model_path: Path = MODEL_PATH, device: str | None = None):
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
@@ -21,7 +28,7 @@ class DefectPredictor:
             raise FileNotFoundError(
                 f"Model not found at {self.model_path}. Run: python -m src.train"
             )
-        payload = torch.load(self.model_path, map_location=self.device, weights_only=False)
+        payload = _load_checkpoint(self.model_path, self.device)
         self.model = DefectCNN()
         self.model.load_state_dict(payload["state_dict"])
         self.model.to(self.device)
